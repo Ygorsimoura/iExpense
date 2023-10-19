@@ -8,32 +8,40 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var currentNumber = 1
-    @State private var numbers = [Int]()
+    @StateObject var expenses = Expenses()
+    @State private var showingSheets = false
     var body: some View {
         NavigationView{
-            VStack{
-                List{
-                    ForEach(numbers, id: \.self){
-                        Text("Row number: \($0)")
-                    }.onDelete(perform: RemoveRows)
+            List{
+                ForEach(expenses.items) { item in
+                    HStack{
+                        VStack(alignment: .leading){
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        Spacer()
+                        Text(item.amount, format: .currency(code: "USD"))
+                    }
+                    
                 }
-                Button(
-                    "Add Number"
-                ){
-                    numbers.append(currentNumber)
-                    currentNumber += 1
-                }
+                .onDelete(perform: removeIntens)
             }
-            .navigationTitle("Append +")
+            .navigationTitle("iExpense")
             .toolbar{
-                EditButton()
+                Button{
+                   showingSheets = true
+                }label: {
+                    Image(systemName: "plus")
+                }
             }
-        
+            .sheet(isPresented: $showingSheets){
+                AddView(expenses: expenses)
+            }
         }
     }
-    func RemoveRows(at offsets: IndexSet){
-        numbers.remove(atOffsets: offsets)
+    func removeIntens(at Offsets: IndexSet){
+        expenses.items.remove(atOffsets: Offsets)
     }
 }
 
