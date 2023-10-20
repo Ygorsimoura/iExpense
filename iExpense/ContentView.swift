@@ -12,38 +12,50 @@ struct ContentView: View {
     @State private var showingSheets = false
     var body: some View {
         NavigationView{
-            List{
-                ForEach(expenses.items) { item in
-                    HStack{
-                        VStack(alignment: .leading){
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
+                List{
+                    ForEach(expenses.items) { item in
+                        HStack{
+                            Image(systemName: "capsule.portrait.fill")
+                                .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 9))
+                                .foregroundColor(
+                                    item.amount < 10.0
+                                        ? Color(.green)
+                                        : item.amount < 100
+                                            ? Color(.yellow)
+                                            : Color.red
+                                )
+
+                            VStack(alignment: .leading){
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.type)
+                            }
+                            Spacer()
+                            Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                         }
-                        Spacer()
-                        Text(item.amount, format: .currency(code: "USD"))
+                        
                     }
-                    
+                    .onDelete(perform: removeIntens)
                 }
-                .onDelete(perform: removeIntens)
-            }
-            .navigationTitle("iExpense")
-            .toolbar{
-                Button{
-                   showingSheets = true
-                }label: {
-                    Image(systemName: "plus")
+                .navigationTitle("iExpense")
+                .toolbar{
+                    Button{
+                       showingSheets = true
+                    }label: {
+                        Image(systemName: "plus")
+                    }
                 }
+                .sheet(isPresented: $showingSheets){
+                    AddView(expenses: expenses)
             }
-            .sheet(isPresented: $showingSheets){
-                AddView(expenses: expenses)
             }
         }
-    }
     func removeIntens(at Offsets: IndexSet){
-        expenses.items.remove(atOffsets: Offsets)
+            expenses.items.remove(atOffsets: Offsets)
+        }
     }
-}
+    
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
